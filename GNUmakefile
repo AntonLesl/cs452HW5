@@ -1,28 +1,6 @@
-prog?=$(basename $(notdir $(PWD)))
-objs+=$(addsuffix .o,$(basename $(wildcard *.c *.cc)))
+prog=wam
 
-defines+=-D_GNU_SOURCE
-ccflags+=-g -Wall -MMD $(defines)
-ldflags+=-g
+ccflags=-pthread
+ldflags=-pthread -lX11 -lfltk -lstdc++
 
-.SUFFIXES:
-
-%.o: %.c  ; gcc -o $@ -c $< $(ccflags)
-%.i: %.c  ; gcc -o $@ -E $< $(defines)
-%.s: %.c  ; gcc -o $@ -S $< $(defines)
-%.o: %.cc ; g++ -o $@ -c $< $(ccflags)
-%.i: %.cc ; g++ -o $@ -E $< $(defines)
-%.s: %.cc ; g++ -o $@ -S $< $(defines)
-
-ld?=gcc
-
-$(prog): $(objs) ; $(ld) -o $@ $^ $(ldflags)
-
-.PHONY: clean run valgrind
-
-clean:: ; rm -f $(prog) *.o *.d *.i
-
-run:      $(prog) ; ./$< $(args)
-valgrind: $(prog) ; $@ --leak-check=full --show-leak-kinds=all ./$< $(args)
-
-sinclude *.d
+include ../GNUmakefile
